@@ -4,9 +4,9 @@
 Created on Sat Jul 17 16:09:52 2021
 """
 
-# Your name:
-# Your student id:
-# Your email:
+# Your name: Susan Cheng
+# Your student id: 43830881
+# Your email: schengg@umich.edu
 # List who you have worked with on this project:
 
 import io
@@ -32,6 +32,19 @@ def load_csv(file):
     '''
     data_dict = {}
 
+    with open(file, 'r') as csv_file:
+
+        data = csv.DictReader(csv_file, delimiter = ",")
+
+        for row in data:
+            data_dict[row["Region"]] = {}
+            for key in row.keys():
+                if key != "Region":
+                    data_dict[row["Region"]][key] = int(row[key])
+    
+    return (data_dict)
+
+
 def get_perc(data_dict):
     '''
     Calculate the percentage of each demographic using this
@@ -49,6 +62,15 @@ def get_perc(data_dict):
         for each demographic for each region in the data set
     '''
     pct_dict = {}
+
+    for region in data_dict.keys():
+        pct_dict[region] = {}
+        for i in data_dict[region].keys():
+            if i != "Region Totals":
+                pct_dict[region][i] = round(int(data_dict[region][i]) / int(data_dict[region]["Region Totals"]) * 100, 2)
+            
+    return (pct_dict)
+
 
 def get_diff(ap_data, census_data):
     '''
