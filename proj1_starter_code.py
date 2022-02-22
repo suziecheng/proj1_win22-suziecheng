@@ -190,7 +190,29 @@ def min_max(data_dict):
         a triple nested dict with the this basic format
         {"max":{demographic:{"region":value}}}
     '''
-    min_max = {}
+    min_max = {"max":{}, "min":{}}
+
+    for i in data_dict.keys():
+        temp = dict(sorted(data_dict[i].items(), key=lambda item: item[1], reverse=True))
+        min_max["max"][i] = {}
+        for j in temp:
+            if len(min_max["max"][i]) == 0:
+                min_max["max"][i][j] = temp[j]
+            elif len(min_max["max"][i]) < 5:
+                min_max["max"][i][j] = temp[j]
+
+    for i in data_dict.keys():
+        temp = dict(sorted(data_dict[i].items(), key=lambda item: item[1]))
+        min_max["min"][i] = {}
+        for j in temp:
+            if len(min_max["min"][i]) == 0:
+                min_max["min"][i][j] = temp[j]
+            elif len(min_max["min"][i]) < 5:
+                min_max["min"][i][j] = temp[j]
+
+    print (min_max)
+    return (min_max)
+    
 
 def nat_perc(data_dict, col_list):
     '''
@@ -236,13 +258,18 @@ def nat_diff(data_dict1, data_dict2):
 
 def main():
     # read in the data
+    region_census = load_csv("region_census_data.csv")  
+    region_ap = load_csv("region_ap_data.csv")
 
     # compute demographic percentages
+    census_perc = get_perc(region_census)
+    ap_perc = get_perc(region_ap)
 
     # computing the difference between test taker and state demographics
+    pct_dif_dict = get_diff(census_perc, ap_perc)
 
     # outputing the csv
-    write_csv(pct_dif_dict, "HW5V1.csv")
+    write_csv(pct_dif_dict, "proj1-cheng.csv")
 
     # creating a list from the keys of inner dict
     col_list = list(pct_dif_dict["west"].keys())
@@ -255,15 +282,15 @@ def main():
 
     # extra credit
     # providing a list of col vals to cycle through
-    col_list = census_data["west"].keys()
+    'col_list = census_data["west"].keys()'
 
     # computing the national percentages
-    ap_nat_perc = nat_perc(ap_data, col_list)
-    census_nat_perc = nat_perc(census_data, col_list)
+    'ap_nat_perc = nat_perc(ap_data, col_list)'
+    'census_nat_perc = nat_perc(census_data, col_list)'
 
     # computing the difference between them
-    dif = nat_diff(ap_nat_perc, census_nat_perc)
-    print("Difference between AP Comp Sci A and national demographics:\n", dif)
+    'dif = nat_diff(ap_nat_perc, census_nat_perc)'
+    'print("Difference between AP Comp Sci A and national demographics:\n", dif)'
 
 main()
 
