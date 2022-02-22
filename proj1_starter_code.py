@@ -10,10 +10,13 @@ Created on Sat Jul 17 16:09:52 2021
 # List who you have worked with on this project:
 
 import io
+from multiprocessing.sharedctypes import Value
 import sys
 import csv
 import unittest
 
+
+# Question 1
 def load_csv(file):
     '''
     Reads in the csv, removes the header (first row) and
@@ -45,6 +48,7 @@ def load_csv(file):
     return (data_dict)
 
 
+# Question 2
 def get_perc(data_dict):
     '''
     Calculate the percentage of each demographic using this
@@ -72,6 +76,8 @@ def get_perc(data_dict):
     return (pct_dict)
 
 
+# Question 3
+# (census_data) - (ap_data)
 def get_diff(ap_data, census_data):
     '''
     Takes the absolute value, rounded to 2 deicmal places,
@@ -92,6 +98,17 @@ def get_diff(ap_data, census_data):
     '''
     pct_dif_dict = {}
 
+    for region in census_data.keys():
+        pct_dif_dict[region] = {}
+        for demo in census_data[region].keys():
+            if demo != "NO RESPONSE" and demo != "Region Totals":
+                value = census_data[region][demo] - ap_data[region][demo]
+                pct_dif_dict[region][demo] = abs(round(value, 2))
+
+    return(pct_dif_dict)
+
+
+# Question 4
 def write_csv(data_dict, file_name):
     '''
     Writes the data to csv, adding the header as
@@ -109,7 +126,26 @@ def write_csv(data_dict, file_name):
     -------
     None. (Doesn't return anything)
     '''
-    pass
+
+    with open(file_name, "w", newline="") as fileout:
+        
+        header = ["Region"] + list(data_dict["midwest"].keys())
+
+        line = header[0]
+        for i in range(len(header)):
+            if i > 0:
+                line += "," + header[i]
+        line += "\n"
+        fileout.write(line)
+        
+    
+        for region in data_dict.keys():
+            line = region
+            for demo in data_dict[region].keys():
+                line += "," + str(data_dict[region][demo])
+            line += "\n"
+            fileout.write(line)
+
 
 def max_min_mutate(data_dict, col_list):
     # Do not change the code in this function
@@ -136,6 +172,8 @@ def max_min_mutate(data_dict, col_list):
             demo_vals[demo].setdefault(region, data_dict[region][demo])
     return demo_vals
 
+
+# Question 5
 def min_max(data_dict):
     '''
     Finds the max and min regions and vals for each demographic,
@@ -226,8 +264,7 @@ def main():
 
     # computing the difference between them
     dif = nat_diff(ap_nat_perc, census_nat_perc)
-    print("Difference between AP Comp Sci A and national demographics:\n",
-          dif)
+    print("Difference between AP Comp Sci A and national demographics:\n", dif)
 
 main()
 
